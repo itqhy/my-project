@@ -5,7 +5,7 @@ export async function query(params) {
 }
 
 export async function add(params) {
-  return request('/user/add', {
+  return request('/api/user/api', {
     method: 'POST',
     body: params
   });
@@ -16,22 +16,20 @@ export async function queryCurrent() {
 }
 
 export async function remove(params) {
-  return request('/user/remove', {
-    method: 'POST',
-    body: params
+  return request(`/api/user/api/${params.userId}`, {
+    method: 'DELETE'
   })
 }
 
 export async function deleteBatch(params) {
-  return request('/user/deleteBatch', {
-    method: 'POST',
-    body: params
+  return request(`/api/user/api/${params}`, {
+    method: 'DELETE'
   })
 }
 
 export async function update(params) {
-  return request('/user/update', {
-    method: 'POST',
+  return request(`/api/user/api`, {
+    method: 'PUT',
     body: params
   });
 }

@@ -37,8 +37,6 @@ const CreateForm = Form.create()(props => {
     const handleAddData = () => {
         form.validateFields((err, fieldsValue) => {
             if (err) return;
-            fieldsValue.birthday = moment(fieldsValue.birthday).format(dateFormat);
-            console.log(fieldsValue);
             handleAdd(fieldsValue);
         });
     }
@@ -46,10 +44,6 @@ const CreateForm = Form.create()(props => {
     const handleUpdData = () => {
         form.validateFields((err, fieldsValue) => {
             if (err) return;
-            fieldsValue.birthday = moment(fieldsValue.birthday).format(dateFormat);
-            const id = form.getFieldValue("id");
-            fieldsValue.id = id;
-            console.log(fieldsValue);
             handleUpdate(fieldsValue);
         });
     }
@@ -65,24 +59,24 @@ const CreateForm = Form.create()(props => {
                 <Row gutter={8}>
                     <Col md={12} sm={24}>
                         <FormItem label="账号" {...formItemLayout}>
-                            {getFieldDecorator('account', {
+                            {getFieldDecorator('username', {
                                 rules: [{ required: true, message: '请输入账号' }],
-                                initialValue: modalStatus === 'update' ? (record ? record.account : '') : ''
+                                initialValue: modalStatus === 'update' ? (record ? record.username : '') : ''
                             })(<Input placeholder="请输入" />)}
                         </FormItem>
                     </Col>
                     <Col md={12} sm={24}>
                         <FormItem label="姓名" {...formItemLayout}>
-                            {getFieldDecorator('name', {
+                            {getFieldDecorator('realname', {
                                 rules: [{ required: true, message: '请输入姓名' }],
-                                initialValue: modalStatus === 'update' ? (record ? record.name : '') : ''
+                                initialValue: modalStatus === 'update' ? (record ? record.realname : '') : ''
                             })(<Input placeholder="请输入" />)}
                         </FormItem>
                     </Col>
                     {modalStatus === 'update' &&
                         <Col md={0} sm={0}>
                             <FormItem>
-                                {getFieldDecorator('id', { initialValue: record.id })(<Input />)}
+                                {getFieldDecorator('userId', { initialValue: record.userId })(<Input />)}
                             </FormItem>
                         </Col>
                     }
@@ -115,12 +109,12 @@ const CreateForm = Form.create()(props => {
                                 initialValue: modalStatus === 'update' ? (record && String(record.sex)) : undefined
                             })(<Select placeholder="请选择性别" style={{ width: 180 }} allowClear>
                                 <Select.Option key="1">男</Select.Option>
-                                <Select.Option key="2">女</Select.Option>
+                                <Select.Option key="0">女</Select.Option>
                             </Select>)}
                         </FormItem>
                     </Col>
 
-                    <Col md={12} sm={24}>
+                    {/* <Col md={12} sm={24}>
                         <FormItem label="出生日期" {...formItemLayout} hasFeedback>
                             {getFieldDecorator('birthday', {
                                 rules: [{ required: true, message: '请选择出生日期' },],
@@ -128,7 +122,7 @@ const CreateForm = Form.create()(props => {
                             })(<DatePicker placeholder="请选择出生日期" style={{ width: 180 }} allowClear />)
                             }
                         </FormItem>
-                    </Col>
+                    </Col> */}
 
                 </Row>
             </Form>
@@ -166,13 +160,13 @@ export default class UserList extends React.Component {
             if (err) return;
             this.setState({ formValues: fieldsValue });
 
-            if(fieldsValue['createtime'] != undefined) {
+            if (fieldsValue['createtime'] != undefined) {
                 fieldsValue = {
                     ...fieldsValue,
                     'createtime': fieldsValue['createtime'].format(dateFormat)
                 }
             }
-          
+
 
             dispatch({
                 type: 'user/fetch',
@@ -284,9 +278,9 @@ export default class UserList extends React.Component {
         const { dispatch } = this.props;
         dispatch({
             type: 'user/remove',
-            payload: { id: id },
+            payload: { userId: id },
             callback: (result) => {
-                if (result.code == 0) {
+                if (result.code === 0) {
                     message.success('删除成功');
                 } else {
                     message.error(result.message);
@@ -427,7 +421,7 @@ export default class UserList extends React.Component {
                         <Divider type="vertical" />
                         <a href="javascript:void(0);" onClick={() => this.handleEditModalVisible(true, record)} >修改</a>
                         <Divider type="vertical" />
-                        <Popconfirm title="确定要删除吗?" onConfirm={() => this.deleteHandler(record.id)}>
+                        <Popconfirm title="确定要删除吗?" onConfirm={() => this.deleteHandler(record.userId)}>
                             <a href="">删除</a>
                         </Popconfirm>
                     </span>
