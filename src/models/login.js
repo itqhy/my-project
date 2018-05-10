@@ -8,7 +8,7 @@ export default {
 
   state: {
     status: undefined,
-    currentUser: {}
+    currentUser: {},
   },
 
   effects: {
@@ -58,7 +58,7 @@ export default {
         ...state,
         status: payload.status,
         type: payload.type,
-        currentUser:payload.user
+        currentUser: payload.user,
       };
     },
   },

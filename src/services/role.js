@@ -8,20 +8,19 @@ export async function query(params) {
 export async function add(params) {
   return request('/api/role', {
     method: 'POST',
-    body: params
+    body: params,
   });
 }
 
-
 export async function remove(params) {
   return request(`/api/role/${params.roleId}`, {
-    method: 'DELETE'
-  })
+    method: 'DELETE',
+  });
 }
 
 export async function update(params) {
   return request(`/api/role`, {
     method: 'PUT',
-    body: params
+    body: params,
   });
 }

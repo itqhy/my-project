@@ -11,20 +11,14 @@ export async function add(params) {
   });
 }
 
-export async function queryCurrent() {
-  return request('/user/currentUser');
-}
-
 export async function remove(params) {
   return request(`/api/user/api/${params.userId}`, {
     method: 'DELETE',
   });
 }
 
-export async function deleteBatch(params) {
-  return request(`/api/user/api/${params}`, {
-    method: 'DELETE',
-  });
+export async function queryTree(params) {
+  return request('/api/permission/tree');
 }
 
 export async function update(params) {

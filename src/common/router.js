@@ -78,6 +78,11 @@ export const getRouterData = app => {
     '/admin/system/role': {
       component: dynamicWrapper(app, ['role'], () => import('../routes/RoleManager/Role')),
     },
+    '/admin/system/permission': {
+      component: dynamicWrapper(app, ['permission'], () =>
+        import('../routes/PermissionManager/Permission')
+      ),
+    },
     '/admin/exception/403': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/403')),
     },

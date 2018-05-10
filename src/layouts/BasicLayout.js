@@ -108,7 +108,7 @@ class BasicLayout extends React.PureComponent {
       type: 'user/fetchCurrent',
     });
   }
-  componentWillUnmount(){
+  componentWillUnmount() {
     unenquireScreen(this.enquireHandler);
   }
   getPageTitle() {
@@ -273,7 +273,7 @@ class BasicLayout extends React.PureComponent {
   }
 }
 
-export default connect(({ login,global, loading }) => ({
+export default connect(({ login, global, loading }) => ({
   currentUser: login.currentUser,
   collapsed: global.collapsed,
   // fetchingNotices: loading.effects['global/fetchNotices'],

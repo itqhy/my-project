@@ -1,4 +1,11 @@
-import { query as queryUsers, add, queryCurrent, remove, deleteBatch, update } from '../services/user';
+import {
+  query as queryUsers,
+  add,
+  queryCurrent,
+  remove,
+  deleteBatch,
+  update,
+} from '../services/user';
 
 export default {
   namespace: 'user',
@@ -6,7 +13,7 @@ export default {
   state: {
     data: {
       list: [],
-      pagination: {}
+      pagination: {},
     },
   },
 
@@ -19,10 +26,9 @@ export default {
           total: response.total,
           pageSize: response.size || 10,
           current: response.current || 1,
-        }
-      }
+        },
+      };
       yield put({ type: 'save', payload: dataSource });
-    
     },
     *add({ payload, callback }, { call, put }) {
       const response = yield call(add, payload);
@@ -56,8 +62,8 @@ export default {
     save(state, action) {
       return {
         ...state,
-        data: action.payload
+        data: action.payload,
       };
-    }
-  }
+    },
+  },
 };

@@ -1,13 +1,14 @@
-import { query, add, remove, update } from '../services/role';
+import { query, add, remove, update, queryTree } from '../services/permission';
 
 export default {
-  namespace: 'role',
+  namespace: 'permission',
 
   state: {
     data: {
       list: [],
       pagination: {},
     },
+    trees: [],
   },
 
   effects: {
@@ -35,6 +36,10 @@ export default {
       const response = yield call(update, payload);
       if (callback) callback(response);
     },
+    *fetTree({ payload }, { call, put }) {
+      const response = yield call(queryTree, payload);
+      yield put({ type: 'initTree', payload: response });
+    },
   },
 
   reducers: {
@@ -42,6 +47,12 @@ export default {
       return {
         ...state,
         data: action.payload,
+      };
+    },
+    initTree(state, action) {
+      return {
+        ...state,
+        trees: action.payload,
       };
     },
   },
