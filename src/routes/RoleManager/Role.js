@@ -5,7 +5,6 @@ import {
     Form,
     Card,
     Button,
-    DatePicker,
     Badge,
     Divider,
     Row,
@@ -14,12 +13,17 @@ import {
     Select,
     Modal,
     message,
+    InputNumber,
+    Dropdown,
+    menu,
+    Icon,
+    Menu,
     Popconfirm
 } from 'antd';
 import StandardTable from '../../components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import styles from './UserTableList.less';
-
+import styles from './Role.less';
+const { TextArea } = Input;
 
 const status = ['正常', '锁定'];
 const FormItem = Form.Item;
@@ -29,8 +33,8 @@ const CreateForm = Form.create()(props => {
     const { modalVisible, form, handleAdd, handleModalVisible, modalStatus, record, handleUpdate } = props;
     const { getFieldDecorator, getFieldsValue } = form;
     const formItemLayout = {
-        labelCol: { span: 7 },
-        wrapperCol: { span: 16 },
+        labelCol: { span: 6 },
+        wrapperCol: { span: 18 },
     };
 
 
@@ -50,80 +54,56 @@ const CreateForm = Form.create()(props => {
 
 
     return (
-        <Modal title={modalStatus == 'update' ? '编辑用户' : '新建用户'}
+        <Modal title={modalStatus == 'update' ? '编辑角色' : '新建角色'}
             visible={modalVisible}
             destroyOnClose={true}
             onOk={modalStatus === 'update' ? handleUpdData : handleAddData}
             onCancel={() => handleModalVisible()} width={600}>
-            <Form layout="horizontal">
+            <Form layout="horizontal" hideRequiredMark={true}>
                 <Row gutter={8}>
                     <Col md={12} sm={24}>
-                        <FormItem label="账号" {...formItemLayout}>
-                            {getFieldDecorator('username', {
-                                rules: [{ required: true, message: '请输入账号' }],
-                                initialValue: modalStatus === 'update' ? (record ? record.username : '') : ''
+                        <FormItem label="名称" {...formItemLayout} >
+                            {getFieldDecorator('name', {
+                                rules: [{ required: true, message: '请输入名称' }],
+                                initialValue: modalStatus === 'update' ? (record ? record.name : '') : ''
                             })(<Input placeholder="请输入" />)}
                         </FormItem>
                     </Col>
                     <Col md={12} sm={24}>
-                        <FormItem label="姓名" {...formItemLayout}>
-                            {getFieldDecorator('realname', {
-                                rules: [{ required: true, message: '请输入姓名' }],
-                                initialValue: modalStatus === 'update' ? (record ? record.realname : '') : ''
+                        <FormItem label="标题" {...formItemLayout} >
+                            {getFieldDecorator('title', {
+                                rules: [{ required: true, message: '请输入标题' }],
+                                initialValue: modalStatus === 'update' ? (record ? record.title : '') : ''
                             })(<Input placeholder="请输入" />)}
                         </FormItem>
                     </Col>
                     {modalStatus === 'update' &&
                         <Col md={0} sm={0}>
                             <FormItem>
-                                {getFieldDecorator('userId', { initialValue: record.userId })(<Input />)}
+                                {getFieldDecorator('roleId', { initialValue: record.roleId })(<Input />)}
                             </FormItem>
                         </Col>
                     }
                 </Row>
                 <Row gutter={8}>
                     <Col md={12} sm={24}>
-                        <FormItem label="邮箱" {...formItemLayout} hasFeedback>
-                            {getFieldDecorator('email', {
-                                rules: [{ required: true, message: '请输入邮箱' },
-                                { type: 'email', message: '请输入正确的邮箱格式' },],
-                                initialValue: modalStatus === 'update' ? (record ? record.email : '') : ''
-                            })(<Input placeholder="请输入" />)}
-                        </FormItem>
-                    </Col>
-                    <Col md={12} sm={24}>
-                        <FormItem label="电话" {...formItemLayout} hasFeedback>
-                            {getFieldDecorator('phone', {
-                                rules: [{ required: true, pattern: /^1[34578]\d{9}$/, message: '请输入联系方式' },],
-                                initialValue: modalStatus === 'update' ? (record ? record.phone : '') : ''
-                            })(<Input placeholder="请输入" />)
-                            }
+                        <FormItem label="排序" {...formItemLayout} >
+                            {getFieldDecorator('orders', {
+                                rules: [{ required: true, message: '请输入排序' }],
+                                initialValue: modalStatus === 'update' ? (record ? record.orders : '') : ''
+                            })(<InputNumber min={1} placeholder="请输入序号" style={{ width: 200 }} />)}
                         </FormItem>
                     </Col>
                 </Row>
-                <Row gutter={8}>
-                    <Col md={12} sm={24}>
-                        <FormItem label="性别" {...formItemLayout} hasFeedback>
-                            {getFieldDecorator('sex', {
-                                rules: [{ required: true, message: '请选择性别' }],
-                                initialValue: modalStatus === 'update' ? (record && String(record.sex)) : undefined
-                            })(<Select placeholder="请选择性别" style={{ width: 180 }} allowClear>
-                                <Select.Option key="1">男</Select.Option>
-                                <Select.Option key="0">女</Select.Option>
-                            </Select>)}
+                <Row gutter={16}>
+                    <Col md={24} sm={48}>
+                        <FormItem label="描述" labelCol={{ span: 3 }} wrapperCol={{ span: 21 }} >
+                            {getFieldDecorator('description', {
+                                rules: [{ required: false, message: '请输入描述' },],
+                                initialValue: modalStatus === 'update' ? (record ? record.description : '') : ''
+                            })(<TextArea placeholder="请输入" autosize={{ minRows: 5 }} />)}
                         </FormItem>
                     </Col>
-
-                    {/* <Col md={12} sm={24}>
-                        <FormItem label="出生日期" {...formItemLayout} hasFeedback>
-                            {getFieldDecorator('birthday', {
-                                rules: [{ required: true, message: '请选择出生日期' },],
-                                initialValue: modalStatus === 'update' ? (record ? moment(record.birthday) : null) : null
-                            })(<DatePicker placeholder="请选择出生日期" style={{ width: 180 }} allowClear />)
-                            }
-                        </FormItem>
-                    </Col> */}
-
                 </Row>
             </Form>
         </Modal>
@@ -133,24 +113,24 @@ const CreateForm = Form.create()(props => {
 
 
 
-@connect(({ user, loading }) => ({
-    user,
-    loading: loading.models.user
+@connect(({ role, loading }) => ({
+    role,
+    loading: loading.models.role
 }))
 @Form.create()
-export default class UserList extends React.Component {
+export default class Role extends React.Component {
     state = {
         modalVisible: false,
         selectedRows: [],
-        formValues: {},
     }
 
     componentDidMount() {
         this.props.dispatch({
-            type: 'user/fetch',
+            type: 'role/fetch',
         });
     }
 
+    //查询
     handleSearch = e => {
         e.preventDefault();
 
@@ -160,22 +140,13 @@ export default class UserList extends React.Component {
             if (err) return;
             this.setState({ formValues: fieldsValue });
 
-            if (fieldsValue['createtime'] != undefined) {
-                fieldsValue = {
-                    ...fieldsValue,
-                    'createtime': fieldsValue['createtime'].format(dateFormat)
-                }
-            }
-
-
             dispatch({
-                type: 'user/fetch',
+                type: 'role/fetch',
                 payload: fieldsValue,
             });
 
         });
     }
-
 
     handleStandardTableChange = (pagination, filtersArg, sorter) => {
 
@@ -193,7 +164,7 @@ export default class UserList extends React.Component {
         }
 
         dispatch({
-            type: 'user/fetch',
+            type: 'role/fetch',
             payload: params,
         });
     }
@@ -202,12 +173,12 @@ export default class UserList extends React.Component {
     handleAdd = (fields) => {
         const { dispatch } = this.props;
         dispatch({
-            type: 'user/add',
+            type: 'role/add',
             payload: fields,
             callback: (result) => {
                 if (result.code === 0) {
                     message.success('添加成功');
-                    this.setState({ modalVisible: false});
+                    this.setState({ modalVisible: false });
                     this.handleFormReset();
                 } else {
                     message.error(result.message);
@@ -219,12 +190,12 @@ export default class UserList extends React.Component {
     handleUpdate = (fields) => {
         const { dispatch } = this.props;
         dispatch({
-            type: 'user/update',
+            type: 'role/update',
             payload: fields,
             callback: (result) => {
                 if (result.code === 0) {
                     message.success('修改成功');
-                    this.setState({ modalVisible: false});
+                    this.setState({ modalVisible: false });
                     this.handleFormReset();
                 } else {
                     message.error(result.message);
@@ -234,55 +205,23 @@ export default class UserList extends React.Component {
     }
 
 
-    //重置查询条件
-    handleFormReset = () => {
-        const { form, dispatch } = this.props;
-        form.resetFields();
-        dispatch({ type: 'user/fetch', });
-    }
 
     //表格选中
     handleSelectRows = (rows) => {
         this.setState({ selectedRows: rows })
     }
 
-    //批量删除
-    handleDelteBeatch = () => {
-        const { dispatch } = this.props;
-        const { selectedRows } = this.state;
-        if (!selectedRows) return;
-        Modal.confirm({
-            title: '你确定要删除吗?',
-            onOk() {
-                dispatch({
-
-                    type: 'user/deleteBatch',
-                    payload: { no: selectedRows.map(row => row.id).join('-') },
-
-                    callback: (result) => {
-                        if (result.code == 0) {
-                            message.success('删除成功');
-                            // this.setState({ selectRows: [] });
-                        } else {
-                            message.error(result.message);
-                        }
-                    }
-
-                });
-            },
-        })
-
-    }
 
     //删除
     deleteHandler = (id) => {
         const { dispatch } = this.props;
         dispatch({
-            type: 'user/remove',
-            payload: { userId: id },
+            type: 'role/remove',
+            payload: { roleId: id },
             callback: (result) => {
                 if (result.code === 0) {
                     message.success('删除成功');
+                    this.handleFormReset();
                 } else {
                     message.error(result.message);
                 }
@@ -290,6 +229,12 @@ export default class UserList extends React.Component {
         })
     }
 
+    //重置查询条件
+    handleFormReset = () => {
+        const { form, dispatch } = this.props;
+        form.resetFields();
+        dispatch({ type: 'role/fetch', });
+    }
 
     //隐藏显示form
     handleModalVisible = flag => {
@@ -313,30 +258,14 @@ export default class UserList extends React.Component {
         });
     }
 
-
     renderForm() {
         const { getFieldDecorator } = this.props.form;
         return (
             <Form layout="inline" onSubmit={this.handleSearch}>
                 <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
                     <Col md={6} sm={24}>
-                        <FormItem label="用户名称">
-                            {getFieldDecorator('username')(<Input placeholder="请输入" />)}
-                        </FormItem>
-                    </Col>
-                    <Col md={6} sm={24}>
-                        <FormItem label="状态">
-                            {getFieldDecorator('locked')(
-                                <Select placeholder="请选择" style={{ width: '100%' }}>
-                                    <Select.Option value="0">启用</Select.Option>
-                                    <Select.Option value="1">冻结</Select.Option>
-                                </Select>)
-                            }
-                        </FormItem>
-                    </Col>
-                    <Col md={6} sm={24}>
-                        <FormItem label="注册日期">
-                            {getFieldDecorator('createtime')(<DatePicker style={{ width: '100%' }} format={dateFormat} placeholder="请输入注册日期" />)}
+                        <FormItem label="名称或标题">
+                            {getFieldDecorator('name')(<Input placeholder="请输入名称或标题" />)}
                         </FormItem>
                     </Col>
                     <Col md={6} sm={24}>
@@ -355,8 +284,7 @@ export default class UserList extends React.Component {
     }
 
     render() {
-
-        const { loading, user: { data } } = this.props;
+        const { loading, role: { data } } = this.props;
         const { modalVisible, modalStatus, record, selectedRows } = this.state;
 
         const parentMethods = {
@@ -365,41 +293,34 @@ export default class UserList extends React.Component {
             handleModalVisible: this.handleModalVisible,
         }
 
+        const rowSelections = {
+            type: 'radio'
+        }
 
         const columns = [
             {
                 title: 'ID',
-                dataIndex: 'userId',
+                dataIndex: 'roleId',
                 align: 'center'
             },
             {
-                title: '账号',
-                dataIndex: 'username'
+                title: '名称',
+                dataIndex: 'name'
             },
             {
-                title: '姓名',
-                dataIndex: 'realname'
+                title: '标题',
+                dataIndex: 'title'
             },
             {
-                title: '性别',
-                dataIndex: 'sex',
-                align: 'center',
-                render: (val) => {
-                    if (val === 1) {
-                        return <span>男</span>
-                    }
-                    return <span>女</span>
-                }
-            },
-            {
-                title: '邮箱',
-                dataIndex: 'email',
+                title: '描述',
+                dataIndex: 'description',
                 align: 'center'
             },
             {
-                title: '电话',
-                dataIndex: 'phone',
-                align: 'center',
+                title: '排序',
+                dataIndex: 'orders',
+                sorter: true,
+                align: 'center'
             },
             {
                 title: '创建时间',
@@ -407,11 +328,6 @@ export default class UserList extends React.Component {
                 sorter: true,
                 align: 'center',
                 render: val => <span> {moment(val).format('YYYY-MM-DD HH:mm:ss')} </span>
-            },
-            {
-                title: '状态',
-                dataIndex: 'locked',
-                render: val => <span>{status[val]}</span>
             },
             {
                 title: '操作',
@@ -422,7 +338,7 @@ export default class UserList extends React.Component {
                         <Divider type="vertical" />
                         <a href="javascript:void(0);" onClick={() => this.handleEditModalVisible(true, record)} >修改</a>
                         <Divider type="vertical" />
-                        <Popconfirm title="确定要删除吗?" onConfirm={() => this.deleteHandler(record.userId)}>
+                        <Popconfirm title="确定要删除吗?" onConfirm={() => this.deleteHandler(record.roleId)}>
                             <a href="">删除</a>
                         </Popconfirm>
                     </span>
@@ -430,10 +346,15 @@ export default class UserList extends React.Component {
             }
         ];
 
-
+        const menu = (
+            <Menu selectedKeys={[]}>
+                <Menu.Item key="remove">删除</Menu.Item>
+                <Menu.Item key="approval">批量审批</Menu.Item>
+            </Menu>
+        );
 
         return (
-            <PageHeaderLayout title="用户管理">
+            <PageHeaderLayout title="角色管理">
                 <Card bordered={false}>
                     <div className={styles.tableList}>
                         <div className={styles.tableListForm}>{this.renderForm()}</div>
@@ -442,14 +363,24 @@ export default class UserList extends React.Component {
                             <Button icon="plus" type="primary" onClick={() => this.handleAddModalVisible(true)}>新建</Button>
 
 
-                            {selectedRows.length > 0 && <Button icon="plus" type="default" onClick={() => this.handleDelteBeatch()}>删除</Button>}
+                            {selectedRows.length > 0 && (
+                                <span>
+                                    <Button icon="plus" type="default">删除</Button>
+                                    <Dropdown overlay={menu}>
+                                        <Button>
+                                            更多操作 <Icon type="down" />
+                                        </Button>
+                                    </Dropdown>
+                                </span>
+                            )}
                         </div>
                     </div>
                     <StandardTable
                         loading={loading}
                         selectedRows={selectedRows}
+                        rowSelections={rowSelections}
                         data={data}
-                        rowKey={record => record.userId}
+                        rowKey={record => record.roleId}
                         columns={columns}
                         onSelectRow={this.handleSelectRows}
                         onChange={this.handleStandardTableChange} />

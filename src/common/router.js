@@ -73,18 +73,18 @@ export const getRouterData = app => {
       component: dynamicWrapper(app, ['user', 'login'], () => import('../layouts/BasicLayout')),
     },
     '/admin/system/user': {
-      component: dynamicWrapper(app, [], () => import('../routes/UserManager/UserTableList')),
+      component: dynamicWrapper(app, ['user'], () => import('../routes/UserManager/UserTableList')),
     },
-      // hideInBreadcrumb: true,
-      // name: '工作台',
-      // authority: 'admin',
-    '/exception/403': {
+    '/admin/system/role': {
+      component: dynamicWrapper(app, ['role'], () => import('../routes/RoleManager/Role')),
+    },
+    '/admin/exception/403': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/403')),
     },
-    '/exception/404': {
+    '/admin/exception/404': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
     },
-    '/exception/500': {
+    '/admin/exception/500': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/500')),
     },
     '/': {
