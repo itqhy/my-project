@@ -56,6 +56,7 @@ export default class Permission extends React.Component {
       type: 'permission/fetch',
     });
   }
+  
 
 
   //表格排序、分页变动
