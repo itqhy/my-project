@@ -287,7 +287,6 @@ export default class Role extends React.Component {
   render() {
     const { loading, role: { data } } = this.props;
     const { modalVisible, modalStatus, record, selectedRows } = this.state;
-
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleUpdate: this.handleUpdate,
@@ -362,13 +361,13 @@ export default class Role extends React.Component {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleAddModalVisible(true)}>
+              <Button type="primary" onClick={() => this.handleAddModalVisible(true)}>
                 新建
               </Button>
 
               {selectedRows.length > 0 && (
                 <span>
-                  <Button icon="plus" type="default">
+                  <Button type="default">
                     删除
                   </Button>
                   <Dropdown overlay={menu}>
@@ -382,7 +381,6 @@ export default class Role extends React.Component {
           </div>
           <StandardTable
             loading={loading}
-            selectedRows={selectedRows}
             rowSelections={rowSelections}
             data={data}
             rowKey={record => record.roleId}

@@ -1,11 +1,11 @@
 import request from '../utils/request';
 import { stringify } from 'qs';
 export async function query(params) {
-  return request(`/api/user/api?${stringify(params)}`);
+  return request(`/api/user?${stringify(params)}`);
 }
 
 export async function add(params) {
-  return request('/api/user/api', {
+  return request('/api/user', {
     method: 'POST',
     body: params,
   });
@@ -16,19 +16,19 @@ export async function queryCurrent() {
 }
 
 export async function remove(params) {
-  return request(`/api/user/api/${params.userId}`, {
+  return request(`/api/user/${params.userId}`, {
     method: 'DELETE',
   });
 }
 
 export async function deleteBatch(params) {
-  return request(`/api/user/api/${params}`, {
+  return request(`/api/user/${params}`, {
     method: 'DELETE',
   });
 }
 
 export async function update(params) {
-  return request(`/api/user/api`, {
+  return request(`/api/user`, {
     method: 'PUT',
     body: params,
   });

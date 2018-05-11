@@ -16,41 +16,31 @@ class StandardTable extends PureComponent {
   constructor(props) {
     super(props);
     const { columns } = props;
-    const needTotalList = initTotalList(columns);
+    // const needTotalList = initTotalList(columns);
 
     this.state = {
       selectedRowKeys: [],
-      needTotalList,
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    // clean state
-    if (nextProps.selectedRows.length === 0) {
-      const needTotalList = initTotalList(nextProps.columns);
-      this.setState({
-        selectedRowKeys: [],
-        needTotalList,
-      });
-    }
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   // clean state
+  //   if (nextProps.selectedRows.length === 0) {
+  //     const needTotalList = initTotalList(nextProps.columns);
+  //     this.setState({
+  //       selectedRowKeys: [],
+  //       needTotalList,
+  //     });
+  //   }
+  // }
 
   handleRowSelectChange = (selectedRowKeys, selectedRows) => {
-    let needTotalList = [...this.state.needTotalList];
-    needTotalList = needTotalList.map(item => {
-      return {
-        ...item,
-        total: selectedRows.reduce((sum, val) => {
-          return sum + parseFloat(val[item.dataIndex], 10);
-        }, 0),
-      };
-    });
 
     if (this.props.onSelectRow) {
       this.props.onSelectRow(selectedRows);
     }
 
-    this.setState({ selectedRowKeys, needTotalList });
+    this.setState({ selectedRowKeys });
   };
 
   handleTableChange = (pagination, filters, sorter) => {
@@ -62,7 +52,7 @@ class StandardTable extends PureComponent {
   };
 
   render() {
-    const { selectedRowKeys, needTotalList } = this.state;
+    const { selectedRowKeys } = this.state;
     const { data: { list, pagination }, loading, columns, rowKey, rowSelections } = this.props;
 
     const paginationProps = {
@@ -82,7 +72,7 @@ class StandardTable extends PureComponent {
 
     return (
       <div className={styles.standardTable}>
-        <div className={styles.tableAlert}>
+        {/* <div className={styles.tableAlert}>
           <Alert
             message={
               <Fragment>
@@ -103,7 +93,7 @@ class StandardTable extends PureComponent {
             type="info"
             showIcon
           />
-        </div>
+        </div> */}
         <Table
           loading={loading}
           rowKey={rowKey || 'key'}

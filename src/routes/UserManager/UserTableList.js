@@ -439,12 +439,12 @@ export default class UserList extends React.Component {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleAddModalVisible(true)}>
+              <Button  type="primary" onClick={() => this.handleAddModalVisible(true)}>
                 新建
               </Button>
 
               {selectedRows.length > 0 && (
-                <Button icon="plus" type="default" onClick={() => this.handleDelteBeatch()}>
+                <Button  type="default" onClick={() => this.handleDelteBeatch()}>
                   删除
                 </Button>
               )}
