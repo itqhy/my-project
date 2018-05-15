@@ -2,57 +2,20 @@ import React, { PureComponent, Fragment } from 'react';
 import { Table, Alert } from 'antd';
 import styles from './index.less';
 
-function initTotalList(columns) {
-  const totalList = [];
-  columns.forEach(column => {
-    if (column.needTotal) {
-      totalList.push({ ...column, total: 0 });
-    }
-  });
-  return totalList;
-}
 
 class StandardTable extends PureComponent {
   constructor(props) {
     super(props);
     const { columns } = props;
-    // const needTotalList = initTotalList(columns);
-
-    this.state = {
-      selectedRowKeys: [],
-    };
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   // clean state
-  //   if (nextProps.selectedRows.length === 0) {
-  //     const needTotalList = initTotalList(nextProps.columns);
-  //     this.setState({
-  //       selectedRowKeys: [],
-  //       needTotalList,
-  //     });
-  //   }
-  // }
-
-  handleRowSelectChange = (selectedRowKeys, selectedRows) => {
-
-    if (this.props.onSelectRow) {
-      this.props.onSelectRow(selectedRows);
-    }
-
-    this.setState({ selectedRowKeys });
-  };
 
   handleTableChange = (pagination, filters, sorter) => {
     this.props.onChange(pagination, filters, sorter);
   };
 
-  cleanSelectedKeys = () => {
-    this.handleRowSelectChange([], []);
-  };
 
   render() {
-    const { selectedRowKeys } = this.state;
     const { data: { list, pagination }, loading, columns, rowKey, rowSelections } = this.props;
 
     const paginationProps = {
@@ -62,9 +25,7 @@ class StandardTable extends PureComponent {
     };
 
     const rowSelection = {
-      selectedRowKeys,
       ...rowSelections,
-      onChange: this.handleRowSelectChange,
       getCheckboxProps: record => ({
         disabled: record.disabled,
       }),

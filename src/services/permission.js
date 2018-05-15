@@ -27,3 +27,7 @@ export async function update(params) {
     body: params,
   });
 }
+export async function getRolePermission(id) {
+  return request(`/api/permission/role/${id}`);
+}
+

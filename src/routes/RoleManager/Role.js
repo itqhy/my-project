@@ -23,6 +23,7 @@ import {
 import StandardTable from '../../components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import styles from './Role.less';
+import RolePermission from './RolePermission';
 const { TextArea } = Input;
 
 const status = ['正常', '锁定'];
@@ -128,6 +129,7 @@ export default class Role extends React.Component {
   state = {
     modalVisible: false,
     selectedRows: [],
+    selectedRowId: ''
   };
 
   componentDidMount() {
@@ -209,9 +211,9 @@ export default class Role extends React.Component {
   };
 
   //表格选中
-  handleSelectRows = rows => {
-    this.setState({ selectedRows: rows });
-  };
+  onSelect = (record, selected, selectedRows) => {
+    this.setState({ selectedRowId: record.roleId, selectedRows: selectedRows });
+  }
 
   //删除
   deleteHandler = id => {
@@ -243,6 +245,7 @@ export default class Role extends React.Component {
       modalVisible: !!flag,
     });
   };
+
 
   handleAddModalVisible = flag => {
     this.setState({
@@ -286,7 +289,7 @@ export default class Role extends React.Component {
 
   render() {
     const { loading, role: { data } } = this.props;
-    const { modalVisible, modalStatus, record, selectedRows } = this.state;
+    const { modalVisible, modalStatus, record, selectedRows, selectedRowId } = this.state;
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleUpdate: this.handleUpdate,
@@ -295,6 +298,7 @@ export default class Role extends React.Component {
 
     const rowSelections = {
       type: 'radio',
+      onSelect: this.onSelect
     };
 
     const columns = [
@@ -367,14 +371,12 @@ export default class Role extends React.Component {
 
               {selectedRows.length > 0 && (
                 <span>
-                  <Button type="default">
-                    删除
-                  </Button>
-                  <Dropdown overlay={menu}>
-                    <Button>
-                      更多操作 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
+                  <RolePermission roleId={selectedRowId} onOk={() => { console.log('确定') }}>
+                    <Button type="default">
+                      分配权限
+                   </Button>
+                  </RolePermission>
+
                 </span>
               )}
             </div>
@@ -385,7 +387,6 @@ export default class Role extends React.Component {
             data={data}
             rowKey={record => record.roleId}
             columns={columns}
-            onSelectRow={this.handleSelectRows}
             onChange={this.handleStandardTableChange}
           />
         </Card>
@@ -395,7 +396,8 @@ export default class Role extends React.Component {
           modalVisible={modalVisible}
           modalStatus={modalStatus}
           record={record}
-        />>
+        />
+
       </PageHeaderLayout>
     );
   }

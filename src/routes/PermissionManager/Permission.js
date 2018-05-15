@@ -80,17 +80,7 @@ export default class Permission extends React.Component {
   };
 
 
-  onExpand = (expandedKeys) => {
-    console.log('onExpand', expandedKeys);
-    // if not set autoExpandParent to false, if children expanded, parent can not collapse.
-    // or, you can remove all expanded children keys.
-    // this.setState({
-    //   expandedKeys,
-    //   autoExpandParent: false,
-    // });
-  }
   onCheck = (checkedKeys) => {
-    console.log('onCheck', checkedKeys);
     this.setState({ checkedKeys });
   }
   onSelect = (selectedKeys, info) => {
@@ -220,11 +210,8 @@ export default class Permission extends React.Component {
           <Grid style={{ width: '15%' }} bordered={"false"}>
             <Tree
               showLine
-              onExpand={this.onExpand}
-              //  expandedKeys={this.state.expandedKeys}
               defaultExpandAll={this.state.defaultExpandAll}
               onCheck={this.onCheck}
-              //  checkedKeys={this.state.checkedKeys}
               onSelect={this.onSelect}
             >{this.renderTreeNodes(trees)}
             </Tree>
