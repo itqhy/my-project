@@ -19,6 +19,7 @@ import {
   Icon,
   Menu,
   Popconfirm,
+  Tooltip
 } from 'antd';
 import StandardTable from '../../components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
@@ -26,7 +27,6 @@ import styles from './Role.less';
 import RolePermission from './RolePermission';
 const { TextArea } = Input;
 
-const status = ['正常', '锁定'];
 const FormItem = Form.Item;
 const dateFormat = 'YYYY-MM-DD';
 
@@ -35,7 +35,7 @@ const CreateForm = Form.create()(props => {
     modalVisible,
     form,
     handleAdd,
-    handleModalVisible,
+    onClose,
     modalStatus,
     record,
     handleUpdate,
@@ -46,45 +46,46 @@ const CreateForm = Form.create()(props => {
     wrapperCol: { span: 18 },
   };
 
-  const handleAddData = () => {
+  const onOk = () => {
+    if (modalStatus === 'see') {
+      onClose();
+      return;
+    }
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      handleAdd(fieldsValue);
+      if (modalStatus === 'add') {
+        handleAdd(fieldsValue);
+      } else {
+        handleUpdate(fieldsValue);
+      }
     });
-  };
-
-  const handleUpdData = () => {
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      handleUpdate(fieldsValue);
-    });
-  };
+  }
 
   return (
     <Modal
-      title={modalStatus == 'update' ? '编辑角色' : '新建角色'}
+      title={{ 'see': '查看', 'add': '新增', 'update': '修改' }[modalStatus]}
       visible={modalVisible}
       destroyOnClose={true}
-      onOk={modalStatus === 'update' ? handleUpdData : handleAddData}
-      onCancel={() => handleModalVisible()}
+      onOk={onOk}
+      onCancel={() => onClose()}
       width={600}
     >
-      <Form layout="horizontal" hideRequiredMark={true}>
+      <Form layout="horizontal">
         <Row gutter={8}>
           <Col md={12} sm={24}>
             <FormItem label="名称" {...formItemLayout}>
               {getFieldDecorator('name', {
                 rules: [{ required: true, message: '请输入名称' }],
-                initialValue: modalStatus === 'update' ? (record ? record.name : '') : '',
-              })(<Input placeholder="请输入" />)}
+                initialValue: record ? record.name : undefined,
+              })(<Input placeholder="请输入" disabled={modalStatus === 'see'} />)}
             </FormItem>
           </Col>
           <Col md={12} sm={24}>
             <FormItem label="标题" {...formItemLayout}>
               {getFieldDecorator('title', {
                 rules: [{ required: true, message: '请输入标题' }],
-                initialValue: modalStatus === 'update' ? (record ? record.title : '') : '',
-              })(<Input placeholder="请输入" />)}
+                initialValue: record ? record.title : undefined,
+              })(<Input placeholder="请输入" disabled={modalStatus === 'see'}/>)}
             </FormItem>
           </Col>
           {modalStatus === 'update' && (
@@ -100,8 +101,8 @@ const CreateForm = Form.create()(props => {
             <FormItem label="排序" {...formItemLayout}>
               {getFieldDecorator('orders', {
                 rules: [{ required: true, message: '请输入排序' }],
-                initialValue: modalStatus === 'update' ? (record ? record.orders : '') : '',
-              })(<InputNumber min={1} placeholder="请输入序号" style={{ width: 200 }} />)}
+                initialValue: record ? record.orders : undefined,
+              })(<InputNumber min={1} placeholder="请输入序号" style={{ width: 200 }} disabled={modalStatus === 'see'}/>)}
             </FormItem>
           </Col>
         </Row>
@@ -110,8 +111,8 @@ const CreateForm = Form.create()(props => {
             <FormItem label="描述" labelCol={{ span: 3 }} wrapperCol={{ span: 21 }}>
               {getFieldDecorator('description', {
                 rules: [{ required: false, message: '请输入描述' }],
-                initialValue: modalStatus === 'update' ? (record ? record.description : '') : '',
-              })(<TextArea placeholder="请输入" autosize={{ minRows: 5 }} />)}
+                initialValue: record ? record.description : undefined,
+              })(<TextArea placeholder="请输入" autosize={{ minRows: 5 }} disabled={modalStatus === 'see'}/>)}
             </FormItem>
           </Col>
         </Row>
@@ -246,19 +247,19 @@ export default class Role extends React.Component {
     });
   };
 
-
-  handleAddModalVisible = flag => {
+  //关闭modal
+  onClose = () => {
     this.setState({
-      modalStatus: 'add',
-      modalVisible: !!flag,
+      modalVisible: false,
     });
   };
 
-  handleEditModalVisible = (flag, record) => {
+  //显示modal
+  handleModalVisible = (record, type) => {
     this.setState({
-      modalVisible: !!flag,
+      modalVisible: true,
       record: record,
-      modalStatus: 'update',
+      modalStatus: type,
     });
   };
 
@@ -293,7 +294,7 @@ export default class Role extends React.Component {
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleUpdate: this.handleUpdate,
-      handleModalVisible: this.handleModalVisible,
+      onClose: this.onClose,
     };
 
     const rowSelections = {
@@ -338,26 +339,29 @@ export default class Role extends React.Component {
         align: 'center',
         render: (text, record) => (
           <span>
-            <a href="">详情</a>
+            <span className="control-btn green" >
+              <Tooltip placement="top" title="查看" onClick={() => this.handleModalVisible(record, 'see')}>
+                <Icon type="eye" />
+              </Tooltip>
+            </span>
             <Divider type="vertical" />
-            <a href="javascript:void(0);" onClick={() => this.handleEditModalVisible(true, record)}>
-              修改
-            </a>
+            <span onClick={() => this.handleModalVisible(record, 'update')} className="control-btn blue">
+              <Tooltip placement="top" title="修改">
+                <Icon type="edit" />
+              </Tooltip>
+            </span>
             <Divider type="vertical" />
             <Popconfirm title="确定要删除吗?" onConfirm={() => this.deleteHandler(record.roleId)}>
-              <a href="">删除</a>
+              <span className="control-btn red">
+                <Tooltip placement="top" title="删除">
+                  <Icon type="delete" />
+                </Tooltip>
+              </span>
             </Popconfirm>
           </span>
         ),
       },
     ];
-
-    const menu = (
-      <Menu selectedKeys={[]}>
-        <Menu.Item key="remove">删除</Menu.Item>
-        <Menu.Item key="approval">批量审批</Menu.Item>
-      </Menu>
-    );
 
     return (
       <PageHeaderLayout title="角色管理">
@@ -365,7 +369,7 @@ export default class Role extends React.Component {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button type="primary" onClick={() => this.handleAddModalVisible(true)}>
+              <Button type="primary" onClick={() => this.handleModalVisible(null, 'add')}>
                 新建
               </Button>
 

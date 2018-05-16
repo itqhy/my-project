@@ -20,14 +20,16 @@ import {
   Menu,
   Tree,
   Popconfirm,
+  Tooltip
 } from 'antd';
 import StandardTable from '../../components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import PermissionModal from './PermissionModal';
 import styles from './Permission.less';
 const { TextArea } = Input;
 
 const statusMap = ['禁止', '正常'];
-const typeMap = ["目录","菜单","按钮"];
+const typeMap = ["目录", "菜单", "按钮"];
 const FormItem = Form.Item;
 const dateFormat = 'YYYY-MM-DD';
 const TreeNode = Tree.TreeNode;
@@ -40,15 +42,16 @@ const Grid = Card.Grid;
 @Form.create()
 export default class Permission extends React.Component {
   state = {
-    defaultExpandAll: true,
+    selectRows: [],
+    treeSelect: {}
   };
 
   componentDidMount() {
-   this.refresh();
+    this.refresh();
   }
 
   //刷新
-  refresh(){
+  refresh() {
     this.props.dispatch({
       type: 'permission/fetTree',
     });
@@ -56,7 +59,7 @@ export default class Permission extends React.Component {
       type: 'permission/fetch',
     });
   }
-  
+
 
 
   //表格排序、分页变动
@@ -79,18 +82,41 @@ export default class Permission extends React.Component {
     });
   };
 
+  //表格选中
+  selectRows = (record, selected, selectedRows) => {
+    this.setState({ selectRows: selectedRows });
+  }
 
-  onCheck = (checkedKeys) => {
-    this.setState({ checkedKeys });
-  }
-  onSelect = (selectedKeys, info) => {
-    const key = selectedKeys[0];
-    const data = {pid:key};
-    this.props.dispatch({
-      type: 'permission/fetch',
-      payload: data
-    });
-  }
+
+  // //选择树
+  // onSelect = (selectedKeys, info) => {
+  //   const key = selectedKeys[0];
+  //   const data = { pid: key };
+  //   this.props.dispatch({
+  //     type: 'permission/fetch',
+  //     payload: data
+  //   });
+  // }
+
+  /** 点击树目录时触发 **/
+  onSelect = (selectedKeys, e) => {
+    console.log('选择的什么：', e);
+    if (e.selected) {   // 选中时才触发
+      const p = e.node.props;
+      this.props.dispatch({
+        type: 'permission/fetch',
+        payload: { pid: p.eventKey }
+      });
+      this.setState({
+        treeSelect: { title: p.title, id: p.eventKey },
+      });
+    } else {
+      this.setState({
+        treeSelect: {},
+      });
+    }
+  };
+
 
   renderTreeNodes = data => {
     return data.map(item => {
@@ -125,6 +151,7 @@ export default class Permission extends React.Component {
 
   render() {
     const { loading, permission: { trees, data } } = this.props;
+    const { selectRows } = this.state;
     const columns = [
       {
         title: 'ID',
@@ -146,7 +173,7 @@ export default class Permission extends React.Component {
       {
         title: '类型',
         dataIndex: 'type',
-        render:val=><span>{typeMap[val-1]}</span>
+        render: val => <span>{typeMap[val - 1]}</span>
       },
       {
         title: '权限值',
@@ -180,51 +207,61 @@ export default class Permission extends React.Component {
         align: 'center',
         render: val => <span> {moment(val).format('YYYY-MM-DD')} </span>,
       },
-      // {
-      //   title: '操作',
-      //   align: 'center',
-      //   render: (text, record) => (
-      //     <span>
-      //       <a href="">详情</a>
-      //       <Divider type="vertical" />
-      //       <a href="javascript:void(0);" onClick={() => this.handleEditModalVisible(true, record)}>
-      //         修改
-      //       </a>
-      //       <Divider type="vertical" />
-      //       <Popconfirm title="确定要删除吗?" onConfirm={() => this.deleteHandler(record.permissionId)}>
-      //         <a href="">删除</a>
-      //       </Popconfirm>
-      //     </span>
-      //   ),
-      // },
+      {
+        title: '操作',
+        align: 'center',
+        render: (text, record) => (
+          <span>
+            <span className="control-btn green" >
+              <Tooltip placement="top" title="查看" onClick={() => this.handleModalVisible(record, 'see')}>
+                <Icon type="eye" />
+              </Tooltip>
+            </span>
+            <Divider type="vertical" />
+            <span onClick={() => this.handleModalVisible(record, 'update')} className="control-btn blue">
+              <Tooltip placement="top" title="修改">
+                <Icon type="edit" />
+              </Tooltip>
+            </span>
+            <Divider type="vertical" />
+            <Popconfirm title="确定要删除吗?" onConfirm={() => this.deleteHandler(record.roleId)}>
+              <span className="control-btn red">
+                <Tooltip placement="top" title="删除">
+                  <Icon type="delete" />
+                </Tooltip>
+              </span>
+            </Popconfirm>
+          </span>
+        ),
+      },
     ];
     const rowSelections = {
       type: 'radio',
+      onSelect: this.selectRows
     };
 
     return (
       <PageHeaderLayout title="角色管理">
 
         <Card bordered={false}>
+          <Grid style={{ width: '15%' }} bordered={"false"} >
 
-          <Grid style={{ width: '15%' }} bordered={"false"}>
             <Tree
-              showLine
-              defaultExpandAll={this.state.defaultExpandAll}
-              onCheck={this.onCheck}
-              onSelect={this.onSelect}
-            >{this.renderTreeNodes(trees)}
+              defaultExpandAll={true}
+              onSelect={this.onSelect}>
+              <TreeNode title="权限管理系统" key="0" >
+                {this.renderTreeNodes(trees)}
+              </TreeNode>
             </Tree>
           </Grid>
 
-          <Grid style={{ width: '83%', marginLeft: 30 }} bordered={"false"}>
-            <div style={{  marginBottom: '2em'}}>
-              <Button type="primary" >
-                新建
-              </Button>
-              <Button type="default" style={{marginLeft:'1em'}}>
-                删除
-              </Button>
+          <Grid style={{ width: '83%', marginLeft: 30 }} >
+            <div className={styles.tableListOperator}>
+              <PermissionModal type="add">
+                <Button type="primary" disabled={!this.state.treeSelect.id}>
+                  新建
+                </Button>
+              </PermissionModal>
             </div>
             <StandardTable
               loading={loading}

@@ -8,7 +8,6 @@ import {
     Modal,
     message,
 } from 'antd';
-import role from '../../models/role';
 const TreeNode = Tree.TreeNode;
 
 @connect(({ permission, loading }) => ({
@@ -24,7 +23,6 @@ export default class RolePermission extends React.PureComponent {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.permission.rolePermissionIds) {
-            console.log(nextProps.permission.rolePermissionIds);
             this.setState({ checkedKeys: nextProps.permission.rolePermissionIds });
         }
     }
@@ -74,7 +72,6 @@ export default class RolePermission extends React.PureComponent {
     render() {
         const { loading, permission: { trees, data, rolePermissionIds }, children } = this.props;
         const { visible } = this.state;
-        console.log(this.state)
         return (
             <span>
                 <span onClick={this.showModelHandler}>
@@ -92,14 +89,16 @@ export default class RolePermission extends React.PureComponent {
                         {
                             loading ?
                                 'loading tree'
-                                : <Tree
-                                    showLine
-                                    defaultExpandAll={true}
-                                    checkable={true}
-                                    onCheck={this.onCheck}
-                                    defaultCheckedKeys={rolePermissionIds}
-                                >{this.renderTreeNodes(trees)}
-                                </Tree>
+                                :
+
+                            <Tree
+                                checkStrictly
+                                defaultExpandAll={true}
+                                checkable={true}
+                                onCheck={this.onCheck}
+                                defaultCheckedKeys={rolePermissionIds}
+                            >{this.renderTreeNodes(trees)}
+                            </Tree>
 
                         }
 

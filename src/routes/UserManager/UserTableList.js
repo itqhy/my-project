@@ -15,12 +15,14 @@ import {
   Modal,
   message,
   Popconfirm,
+  Tooltip,
+  Icon
 } from 'antd';
 import StandardTable from '../../components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import styles from './UserTableList.less';
+import c from 'classnames';
 
-const status = ['正常', '锁定'];
 const FormItem = Form.Item;
 const dateFormat = 'YYYY-MM-DD';
 
@@ -29,7 +31,7 @@ const CreateForm = Form.create()(props => {
     modalVisible,
     form,
     handleAdd,
-    handleModalVisible,
+    onClose,
     modalStatus,
     record,
     handleUpdate,
@@ -40,27 +42,29 @@ const CreateForm = Form.create()(props => {
     wrapperCol: { span: 16 },
   };
 
-  const handleAddData = () => {
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      handleAdd(fieldsValue);
-    });
-  };
+  const onOk = () => {
+    if (modalStatus === 'see') {  //查看
+      onClose();
+      return;
+    }
 
-  const handleUpdData = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      handleUpdate(fieldsValue);
+      if (modalStatus === 'update') {
+        handleUpdate(fieldsValue);
+      } else {
+        handleAdd(fieldsValue);
+      }
     });
-  };
+  }
 
   return (
     <Modal
-      title={modalStatus == 'update' ? '编辑用户' : '新建用户'}
+      title={{ 'see': '查看', 'update': '修改', 'add': '新增' }[modalStatus]}
       visible={modalVisible}
       destroyOnClose={true}
-      onOk={modalStatus === 'update' ? handleUpdData : handleAddData}
-      onCancel={() => handleModalVisible()}
+      onOk={onOk}
+      onCancel={() => onClose()}
       width={600}
     >
       <Form layout="horizontal">
@@ -69,16 +73,16 @@ const CreateForm = Form.create()(props => {
             <FormItem label="账号" {...formItemLayout}>
               {getFieldDecorator('username', {
                 rules: [{ required: true, message: '请输入账号' }],
-                initialValue: modalStatus === 'update' ? (record ? record.username : '') : '',
-              })(<Input placeholder="请输入" />)}
+                initialValue: record ? record.username : undefined,
+              })(<Input placeholder="请输入" disabled={modalStatus === 'see'} />)}
             </FormItem>
           </Col>
           <Col md={12} sm={24}>
             <FormItem label="姓名" {...formItemLayout}>
               {getFieldDecorator('realname', {
                 rules: [{ required: true, message: '请输入姓名' }],
-                initialValue: modalStatus === 'update' ? (record ? record.realname : '') : '',
-              })(<Input placeholder="请输入" />)}
+                initialValue: record ? record.realname : undefined,
+              })(<Input placeholder="请输入" disabled={modalStatus === 'see'} />)}
             </FormItem>
           </Col>
           {modalStatus === 'update' && (
@@ -91,49 +95,39 @@ const CreateForm = Form.create()(props => {
         </Row>
         <Row gutter={8}>
           <Col md={12} sm={24}>
-            <FormItem label="邮箱" {...formItemLayout} hasFeedback>
+            <FormItem label="邮箱" {...formItemLayout}>
               {getFieldDecorator('email', {
                 rules: [
                   { required: true, message: '请输入邮箱' },
                   { type: 'email', message: '请输入正确的邮箱格式' },
                 ],
-                initialValue: modalStatus === 'update' ? (record ? record.email : '') : '',
-              })(<Input placeholder="请输入" />)}
+                initialValue: record ? record.email : undefined,
+              })(<Input placeholder="请输入" disabled={modalStatus === 'see'} />)}
             </FormItem>
           </Col>
           <Col md={12} sm={24}>
-            <FormItem label="电话" {...formItemLayout} hasFeedback>
+            <FormItem label="电话" {...formItemLayout}>
               {getFieldDecorator('phone', {
                 rules: [{ required: true, pattern: /^1[34578]\d{9}$/, message: '请输入联系方式' }],
-                initialValue: modalStatus === 'update' ? (record ? record.phone : '') : '',
-              })(<Input placeholder="请输入" />)}
+                initialValue: record ? record.phone : undefined,
+              })(<Input placeholder="请输入" disabled={modalStatus === 'see'} />)}
             </FormItem>
           </Col>
         </Row>
         <Row gutter={8}>
           <Col md={12} sm={24}>
-            <FormItem label="性别" {...formItemLayout} hasFeedback>
+            <FormItem label="性别" {...formItemLayout}>
               {getFieldDecorator('sex', {
                 rules: [{ required: true, message: '请选择性别' }],
-                initialValue: modalStatus === 'update' ? record && String(record.sex) : undefined,
+                initialValue: record ? record.sex : undefined,
               })(
-                <Select placeholder="请选择性别" style={{ width: 180 }} allowClear>
-                  <Select.Option key="1">男</Select.Option>
-                  <Select.Option key="0">女</Select.Option>
+                <Select placeholder="请选择性别" style={{ width: 180 }} allowClear disabled={modalStatus === 'see'}>
+                  <Select.Option key={1} value={1}>男</Select.Option>
+                  <Select.Option key={0} value={0}>女</Select.Option>
                 </Select>
               )}
             </FormItem>
           </Col>
-
-          {/* <Col md={12} sm={24}>
-                        <FormItem label="出生日期" {...formItemLayout} hasFeedback>
-                            {getFieldDecorator('birthday', {
-                                rules: [{ required: true, message: '请选择出生日期' },],
-                                initialValue: modalStatus === 'update' ? (record ? moment(record.birthday) : null) : null
-                            })(<DatePicker placeholder="请选择出生日期" style={{ width: 180 }} allowClear />)
-                            }
-                        </FormItem>
-                    </Col> */}
         </Row>
       </Form>
     </Modal>
@@ -289,27 +283,21 @@ export default class UserList extends React.Component {
     });
   };
 
-  //隐藏显示form
-  handleModalVisible = flag => {
+  //模态框关闭
+  onClose = () => {
     this.setState({
-      modalVisible: !!flag,
+      modalVisible: false,
     });
   };
-
-  handleAddModalVisible = flag => {
+  //模态框显示
+  handleModalVisible = (flag, record, type) => {
     this.setState({
-      modalStatus: 'add',
-      modalVisible: !!flag,
-    });
-  };
-
-  handleEditModalVisible = (flag, record) => {
-    this.setState({
-      modalVisible: !!flag,
+      modalVisible: true,
       record: record,
-      modalStatus: 'update',
+      modalStatus: type,
     });
   };
+
 
   renderForm() {
     const { getFieldDecorator } = this.props.form;
@@ -364,7 +352,7 @@ export default class UserList extends React.Component {
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleUpdate: this.handleUpdate,
-      handleModalVisible: this.handleModalVisible,
+      onClose: this.onClose,
     };
 
     const columns = [
@@ -412,21 +400,31 @@ export default class UserList extends React.Component {
       {
         title: '状态',
         dataIndex: 'locked',
-        render: val => <span>{status[val]}</span>,
+        render: val => val === 1 ? <span style={{ color: 'red' }}>锁定</span> : <span style={{ color: 'green' }}>正常</span>,
       },
       {
         title: '操作',
         align: 'center',
         render: (text, record) => (
           <span>
-            <a href="">详情</a>
+            <span className="control-btn green" >
+              <Tooltip placement="top" title="查看" onClick={() => this.handleModalVisible(true, record, 'see')}>
+                <Icon type="eye" />
+              </Tooltip>
+            </span>
             <Divider type="vertical" />
-            <a href="javascript:void(0);" onClick={() => this.handleEditModalVisible(true, record)}>
-              修改
-            </a>
+            <span onClick={() => this.handleModalVisible(true, record, 'update')} className="control-btn blue">
+              <Tooltip placement="top" title="修改">
+                <Icon type="edit" />
+              </Tooltip>
+            </span>
             <Divider type="vertical" />
             <Popconfirm title="确定要删除吗?" onConfirm={() => this.deleteHandler(record.userId)}>
-              <a href="">删除</a>
+              <span className="control-btn red">
+                <Tooltip placement="top" title="删除">
+                  <Icon type="delete" />
+                </Tooltip>
+              </span>
             </Popconfirm>
           </span>
         ),
@@ -439,12 +437,12 @@ export default class UserList extends React.Component {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button  type="primary" onClick={() => this.handleAddModalVisible(true)}>
+              <Button type="primary" onClick={() => this.handleModalVisible(true, null, 'add')}>
                 新建
               </Button>
 
               {selectedRows.length > 0 && (
-                <Button  type="default" onClick={() => this.handleDelteBeatch()}>
+                <Button type="default" onClick={() => this.handleDelteBeatch()}>
                   删除
                 </Button>
               )}
@@ -466,7 +464,7 @@ export default class UserList extends React.Component {
           modalVisible={modalVisible}
           modalStatus={modalStatus}
           record={record}
-        />>
+        />
       </PageHeaderLayout>
     );
   }

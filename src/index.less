@@ -29,3 +29,28 @@ body {
     overflow: visible !important;
   }
 }
+
+
+/* 全局table基础样式 */
+:global{
+    .control-btn {
+      font-size: 14px;
+      cursor: pointer;
+      &.green {
+        color: #00a854;
+      }
+      &.red {
+        color: #ff3333;
+      }
+      &.blue {
+        color: #0066cc;
+      }
+    }
+    .ant-pagination {
+      margin-right: 20px;
+    }
+    td {
+      max-width: 300px;
+      min-width: 50px;
+    }
+}

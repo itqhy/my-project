@@ -7,8 +7,9 @@ import { Link } from 'dva/router';
 import NoticeIcon from '../NoticeIcon';
 import HeaderSearch from '../HeaderSearch';
 import styles from './index.less';
-
 export default class GlobalHeader extends PureComponent {
+
+
   componentWillUnmount() {
     this.triggerResizeEvent.cancel();
   }
@@ -97,6 +98,7 @@ export default class GlobalHeader extends PureComponent {
           type={collapsed ? 'menu-unfold' : 'menu-fold'}
           onClick={this.toggle}
         />
+
         <div className={styles.right}>
           <HeaderSearch
             className={`${styles.action} ${styles.search}`}
@@ -147,8 +149,8 @@ export default class GlobalHeader extends PureComponent {
               </span>
             </Dropdown>
           ) : (
-            <Spin size="small" style={{ marginLeft: 8 }} />
-          )}
+              <Spin size="small" style={{ marginLeft: 8 }} />
+            )}
         </div>
       </div>
     );
