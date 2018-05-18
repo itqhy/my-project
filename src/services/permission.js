@@ -12,7 +12,7 @@ export async function add(params) {
 }
 
 export async function remove(params) {
-  return request(`/api/permission/${params.userId}`, {
+  return request(`/api/permission/${params.id}`, {
     method: 'DELETE',
   });
 }
