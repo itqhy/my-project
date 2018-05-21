@@ -1,5 +1,6 @@
 import request from '../utils/request';
 import { stringify } from 'qs';
+import { json } from 'graphlib';
 export async function query(params) {
   return request(`/api/permission/?${stringify(params)}`);
 }
@@ -31,3 +32,10 @@ export async function getRolePermission(id) {
   return request(`/api/permission/role/${id}`);
 }
 
+export async function editRolePermission(id, params) {
+  console.log(params);
+  return request(`/api/permission/${id}`, {
+    method: 'PUT',
+    body: params
+  });
+}

@@ -20,8 +20,13 @@ const menuData = [
         // hideInBreadcrumb: true,
         // hideInMenu: true,
       },
+      {
+        name: '字典管理',
+        path: 'dictype'
+      }
     ],
   },
+
 ];
 
 function formatter(data, parentPath = '/admin/', parentAuthority) {

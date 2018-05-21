@@ -79,9 +79,10 @@ export const getRouterData = app => {
       component: dynamicWrapper(app, ['role'], () => import('../routes/RoleManager/Role')),
     },
     '/admin/system/permission': {
-      component: dynamicWrapper(app, ['permission'], () =>
-        import('../routes/PermissionManager/Permission')
-      ),
+      component: dynamicWrapper(app, ['permission'], () => import('../routes/PermissionManager/Permission')),
+    },
+    '/admin/system/dictype': {
+      component: dynamicWrapper(app, ['dictype'], () => import('../routes/DictypeManager/Dictype')),
     },
     '/admin/exception/403': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/403')),

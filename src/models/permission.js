@@ -1,4 +1,4 @@
-import { query, add, remove, update, queryTree ,getRolePermission} from '../services/permission';
+import { query, add, remove, update, queryTree, getRolePermission, editRolePermission } from '../services/permission';
 
 export default {
   namespace: 'permission',
@@ -9,7 +9,7 @@ export default {
       pagination: {},
     },
     trees: [],
-    rolePermissionIds:[]
+    rolePermissionIds: []
   },
 
   effects: {
@@ -41,10 +41,14 @@ export default {
       const response = yield call(queryTree, payload);
       yield put({ type: 'initTree', payload: response });
     },
-    *getRolePermission({payload},{call,put}){
+    *getRolePermission({ payload }, { call, put }) {
       yield put({ type: 'clearTrees', payload: {} });
-      const response = yield call(getRolePermission,payload);
+      const response = yield call(getRolePermission, payload);
       yield put({ type: 'initTreeChecked', payload: response.data });
+    },
+    *editRolePermission({ payload: { roleId, permissionIds }, callback }, { call, put }) {
+      const response = yield call(editRolePermission, roleId, permissionIds);
+      if (callback) callback(response);
     }
   },
 
@@ -55,11 +59,11 @@ export default {
         data: action.payload,
       };
     },
-    clearTrees(state,action){
+    clearTrees(state, action) {
       state = {
         ...state,
         trees: [],
-        rolePermissionIds:[]
+        rolePermissionIds: []
       };
       return state;
     },
@@ -69,11 +73,11 @@ export default {
         trees: action.payload,
       };
     },
-    initTreeChecked(state,action) {
+    initTreeChecked(state, action) {
       return {
         ...state,
         trees: action.payload.trees,
-        rolePermissionIds:action.payload.rolePermissionIds,
+        rolePermissionIds: action.payload.rolePermissionIds,
       }
     }
   },

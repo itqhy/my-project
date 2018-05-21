@@ -1,14 +1,12 @@
 import {
-  query as queryUsers,
+  query,
   add,
-  queryCurrent,
   remove,
-  deleteBatch,
   update,
-} from '../services/user';
+} from '../services/dictype';
 
 export default {
-  namespace: 'user',
+  namespace: 'dictype',
 
   state: {
     data: {
@@ -19,7 +17,7 @@ export default {
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(queryUsers, payload);
+      const response = yield call(query, payload);
       const dataSource = {
         list: response.records,
         pagination: {
@@ -36,10 +34,6 @@ export default {
     },
     *remove({ payload, callback }, { call, put }) {
       const response = yield call(remove, payload);
-      if (callback) callback(response);
-    },
-    *deleteBatch({ payload, callback }, { call, put }) {
-      const response = yield call(deleteBatch, payload);
       if (callback) callback(response);
     },
     *update({ payload, callback }, { call, put }) {

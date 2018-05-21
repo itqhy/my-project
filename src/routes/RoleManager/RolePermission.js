@@ -7,6 +7,7 @@ import {
     Tree,
     Modal,
     message,
+    Spin
 } from 'antd';
 const TreeNode = Tree.TreeNode;
 
@@ -23,12 +24,29 @@ export default class RolePermission extends React.PureComponent {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.permission.rolePermissionIds) {
+            console.log(nextProps)
             this.setState({ checkedKeys: nextProps.permission.rolePermissionIds });
         }
     }
 
     handleUpdData = () => {
-        const { onOk } = this.props;
+        const { dispatch, roleId } = this.props;
+        const keys = this.state.checkedKeys;
+        dispatch({
+            type: 'permission/editRolePermission',
+            payload: {
+                roleId:roleId,
+                permissionIds: keys.join("-")
+            },
+            callback: result => {
+                if (result.code === 0) {
+                  message.success('添加成功');
+                  this.setState({ visible: false });
+                } else {
+                  message.error(result.message);
+                }
+              },
+        });
 
     }
 
@@ -52,7 +70,7 @@ export default class RolePermission extends React.PureComponent {
     };
 
     onCheck = (checkedKeys, { checkedNodes, halfCheckedKeys }) => {
-        this.setState({ checkedKeys: checkedKeys, halfCheckedKeys: halfCheckedKeys })
+        this.setState({ checkedKeys: checkedKeys.checked, halfCheckedKeys: halfCheckedKeys })
     }
 
 
@@ -88,17 +106,16 @@ export default class RolePermission extends React.PureComponent {
                     <Card style={{ height: 400, overflowY: 'scroll' }}>
                         {
                             loading ?
-                                'loading tree'
+                            <Spin />
                                 :
-
-                            <Tree
-                                checkStrictly
-                                defaultExpandAll={true}
-                                checkable={true}
-                                onCheck={this.onCheck}
-                                defaultCheckedKeys={rolePermissionIds}
-                            >{this.renderTreeNodes(trees)}
-                            </Tree>
+                                <Tree
+                                    checkStrictly
+                                    defaultExpandAll={true}
+                                    checkable={true}
+                                    onCheck={this.onCheck}
+                                    defaultCheckedKeys={rolePermissionIds}
+                                >{this.renderTreeNodes(trees)}
+                                </Tree>
 
                         }
 

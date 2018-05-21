@@ -24,6 +24,7 @@ import {
 } from 'antd';
 import StandardTable from '../../components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import { Icons } from '../../utils/json';
 import styles from './Permission.less';
 const { TextArea } = Input;
 
@@ -180,7 +181,6 @@ export default class Permission extends React.Component {
           callback: result => {
             if (result.code === 0) {
               message.success('修改成功');
-              this.refresh(); //刷新
               this.setState({ visible: false });
             } else {
               message.error(result.message);
@@ -198,7 +198,6 @@ export default class Permission extends React.Component {
           callback: result => {
             if (result.code === 0) {
               message.success('添加成功');
-              this.refresh(); //刷新
               this.setState({ visible: false });
             } else {
               message.error(result.message);
@@ -206,6 +205,8 @@ export default class Permission extends React.Component {
           },
         });
       }
+
+      this.refresh(); //刷新
     });
 
   }
@@ -258,6 +259,7 @@ export default class Permission extends React.Component {
       {
         title: '图标',
         dataIndex: 'icon',
+        render: val => <Icon type={val}/>
       },
 
       {
@@ -455,7 +457,16 @@ export default class Permission extends React.Component {
                       { max: 12, message: '最多输入12位字符' }
                     ],
                   })(
-                    <Input placeholder="请输入权限图标" disabled={type === 'see'} />
+                    <Select
+                      dropdownClassName={styles.iconSelect}
+                      disabled={type === 'see'}
+                    >
+                      {
+                        Icons.map((item, index) => {
+                          return <Option key={index} value={item}><Icon type={item} /></Option>;
+                        })
+                      }
+                    </Select>
                   )}
                 </FormItem>
                 }
